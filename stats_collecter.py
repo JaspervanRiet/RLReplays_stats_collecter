@@ -33,8 +33,7 @@ class PlayerStats:
         return ([self.name, self.score, self.goals,
             self.assists, self.saves, self.shots])
 
-def get_data (response, players, stats):
-    data = json.loads(response.content)
+def get_data (data, players, stats):
     for replay in data["replays"]:
         for player in replay["player_set"]:
             player_name = player["player_name"]
@@ -60,6 +59,8 @@ def main():
     response = requests.get(url)
     if response.ok:
         print("Success!\n")
+        data = json.loads(response.content)
+        title = data["title"]
         stats = defaultdict(dict)
         players = []
         for i in range(0,3):
@@ -68,7 +69,7 @@ def main():
             stats[players[i]] = PlayerStats(players[i],0,0,0,0,0)
 
         print ("\n")
-        get_data(response, players, stats)
+        get_data(data, players, stats)
 
         # We now have all the stats
         table = PrettyTable(['Name', 'Score per game', 'goals',
@@ -77,6 +78,7 @@ def main():
             player = stats[players[i]]
             table.add_row(player.getstats())
 
+        print title
         print table
 
 if __name__ == '__main__':
