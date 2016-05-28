@@ -1,18 +1,18 @@
 import requests
 import json
+import sys
 from collections import defaultdict
 from prettytable import PrettyTable
 
 class PlayerStats:
 
-    def __init__(self, name="name", score=0, goals=0,
-            assists=0, saves=0, shots=0):
+    def __init__(self, name):
         self.name = name
-        self.score = score
-        self.goals = goals
-        self.assists = assists
-        self.saves = saves
-        self.shots = shots
+        self.score = 0
+        self.goals = 0
+        self.assists = 0
+        self.saves = 0
+        self.shots = 0
         self.played = 0
 
     def __eq__(self, other):
@@ -56,7 +56,11 @@ def main():
     url = 'https://www.rocketleaguereplays.com/api/replay-packs/'\
             + str(replay_pack)
     print("Accessing RocketLeagueReplays.com...")
-    response = requests.get(url)
+    try:
+        response = requests.get(url)
+    except requests.exceptions.RequestException as e:
+        print("Error in accessing RocketLeagueReplays.com")
+        sys.exit(1)
     if response.ok:
         print("Success!\n")
         data = json.loads(response.content)
@@ -66,7 +70,7 @@ def main():
         for i in range(0,3):
             players.append(raw_input("Name for player " + str(i + 1)
                 + ": "))
-            stats[players[i]] = PlayerStats(players[i],0,0,0,0,0)
+            stats[players[i]] = PlayerStats(players[i])
 
         print ("\n")
         get_data(data, players, stats)
